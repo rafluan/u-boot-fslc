@@ -165,6 +165,13 @@ config IMX_ELE_DEK_ENCAP
 	  This enabled the DEK blob encapsulation with the ELE API. This option
 	  is only available on imx8ulp and imx9.
 
+config DEK_BLOB_BUFFER
+	depends on ARCH_IMX9 && CMD_DEKBLOB
+	hex "Define the buffer address used for dek blob buffer"
+	help
+	  dek blob will use this buffer for exchanging data with ele. This option
+	  is only available on imx9.
+
 config CMD_PRIBLOB
 	bool "Support the set_priblob_bitfield command"
 	depends on HAS_CAAM && IMX_HAB
