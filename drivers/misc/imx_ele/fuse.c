@@ -15,7 +15,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define FUSE_BANKS	64
 #define WORDS_PER_BANKS 8
 
 struct fsb_map_entry {
@@ -196,7 +195,7 @@ int fuse_sense(u32 bank, u32 word, u32 *val)
 {
 	s32 word_index;
 
-	if (bank >= FUSE_BANKS || word >= WORDS_PER_BANKS || !val)
+	if (word >= WORDS_PER_BANKS || !val)
 		return -EINVAL;
 
 	word_index = map_ele_fuse_index(bank, word);
@@ -241,7 +240,7 @@ int fuse_sense(u32 bank, u32 word, u32 *val)
 	s32 word_index;
 	bool redundancy;
 
-	if (bank >= FUSE_BANKS || word >= WORDS_PER_BANKS || !val)
+	if (word >= WORDS_PER_BANKS || !val)
 		return -EINVAL;
 
 	if (!IS_ENABLED(CONFIG_SCMI_FIRMWARE)) {
@@ -282,7 +281,7 @@ int fuse_read(u32 bank, u32 word, u32 *val)
 	bool redundancy;
 	struct udevice *dev = gd->arch.ele_dev;
 
-	if (bank >= FUSE_BANKS || word >= WORDS_PER_BANKS || !val)
+	if (word >= WORDS_PER_BANKS || !val)
 		return -EINVAL;
 
 	/* If ELE MU is not initialized, Try to use FSB instead */
@@ -317,7 +316,7 @@ int fuse_prog(u32 bank, u32 word, u32 val)
 	int ret;
 	bool lock = false;
 
-	if (bank >= FUSE_BANKS || word >= WORDS_PER_BANKS || !val)
+	if (word >= WORDS_PER_BANKS || !val)
 		return -EINVAL;
 
 	/* Lock 8ULP ECC fuse word, so second programming will return failure.
@@ -348,7 +347,7 @@ int fuse_override(u32 bank, u32 word, u32 val)
 	u32 res = 0;
 	int ret;
 
-	if (bank >= FUSE_BANKS || word >= WORDS_PER_BANKS || !val)
+	if (word >= WORDS_PER_BANKS || !val)
 		return -EINVAL;
 
 	ret = ele_write_shadow_fuse((bank * 8 + word), val, &res);
