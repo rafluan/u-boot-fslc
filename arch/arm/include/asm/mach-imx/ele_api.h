@@ -49,6 +49,8 @@
 #define ELE_ATTEST_REQ (0xDB)
 #define ELE_RELEASE_PATCH_REQ (0xDC)
 #define ELE_OTP_SEQ_SWITH_REQ (0xDD)
+#define ELE_WRITE_SHADOW_REQ (0xF2)
+#define ELE_READ_SHADOW_REQ (0xF3)
 
 /* ELE failure indications */
 #define ELE_ROM_PING_FAILURE_IND (0x0A)
@@ -170,4 +172,6 @@ int ele_commit(u16 fuse_id, u32 *response, u32 *info_type);
 int ele_v2x_get_state(struct v2x_get_state *state, u32 *response);
 int ele_message_call(struct ele_msg *msg);
 int ele_get_hw_unique_key(uint8_t *hwkey, size_t key_size, uint8_t *ctx, size_t ctx_size);
+int ele_write_shadow_fuse(u32 fuse_id, u32 fuse_val, u32 *response);
+int ele_read_shadow_fuse(u32 fuse_id, u32 *fuse_val, u32 *response);
 #endif
