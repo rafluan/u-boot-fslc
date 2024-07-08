@@ -408,7 +408,7 @@ int generate_dek_blob(char *data, uint32_t *data_size)
 		goto exit;
 	}
 
-#ifdef CONFIG_DEK_BLOB_BUFFER
+#if CONFIG_DEK_BLOB_BUFFER
 	input_buf = (uint8_t *)(u64)CONFIG_DEK_BLOB_BUFFER;
 	output_buf = (uint8_t *)(u64)(CONFIG_DEK_BLOB_BUFFER + *data_size);
 	memcpy(input_buf, data, *data_size);
@@ -433,9 +433,9 @@ int generate_dek_blob(char *data, uint32_t *data_size)
 	*data_size = out_data_size;
 
 exit:
-#ifndef CONFIG_DEK_BLOB_BUFFER
-	if(buf)
-		free(buf);
+#if !CONFIG_DEK_BLOB_BUFFER
+	if(output_buf)
+		free(output_buf);
 #endif
 
 	return ret;

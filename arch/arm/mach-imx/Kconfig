@@ -166,8 +166,9 @@ config IMX_ELE_DEK_ENCAP
 	  is only available on imx8ulp and imx9.
 
 config DEK_BLOB_BUFFER
-	depends on ARCH_IMX9 && CMD_DEKBLOB
 	hex "Define the buffer address used for dek blob buffer"
+	default 0x0
+	depends on ARCH_IMX9 && CMD_DEKBLOB
 	help
 	  dek blob will use this buffer for exchanging data with ele. This option
 	  is only available on imx9.
