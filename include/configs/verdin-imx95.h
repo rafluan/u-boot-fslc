@@ -51,7 +51,7 @@
 
 #define XEN_BOOT_ENV \
 	    "domu-android-auto=no\0" \
-            "xenhyper_bootargs=console=dtuart dom0_mem=2048M dom0_max_vcpus=2 \0" \
+            "xenhyper_bootargs=console=dtuart dom0_mem=4096M dom0_max_vcpus=2 \0" \
             "xenlinux_bootargs= \0" \
             "xenlinux_console=hvc0 earlycon=xen\0" \
             "xenlinux_addr=0x9e000000\0" \
