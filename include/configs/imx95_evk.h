@@ -92,7 +92,7 @@
 	BOOTENV \
 	AHAB_ENV \
 	"prepare_mcore=setenv mcore_args pd_ignore_unused;\0" \
-	"cpuidle=cpuidle.off=1\0" \
+	"cpuidle= \0" \
 	"scriptaddr=0x93500000\0" \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
 	"image=Image\0" \
