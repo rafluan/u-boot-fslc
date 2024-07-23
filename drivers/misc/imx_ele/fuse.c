@@ -12,6 +12,7 @@
 #include <env.h>
 #include <asm/mach-imx/ele_api.h>
 #include <asm/global_data.h>
+#include <env.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -273,22 +274,12 @@ int fuse_sense(u32 bank, u32 word, u32 *val)
 }
 #endif
 
-int fuse_read(u32 bank, u32 word, u32 *val)
+static int fuse_read_default(u32 bank, u32 word, u32 *val)
 {
-	u32 res = 0;
-	int ret;
 	s32 word_index;
 	bool redundancy;
-	struct udevice *dev = gd->arch.ele_dev;
 
-	if (word >= WORDS_PER_BANKS || !val)
-		return -EINVAL;
-
-	/* If ELE MU is not initialized, Try to use FSB instead */
-	if (!dev) {
-		if (!IS_FSB_ALLOWED)
-			return -EINVAL;
-
+	if (IS_FSB_ALLOWED) {
 		word_index = map_fsb_fuse_index(bank, word, &redundancy);
 		if (word_index >= 0) {
 			*val = readl((ulong)FSB_BASE_ADDR + FSB_OTP_SHADOW + (word_index << 2));
@@ -296,10 +287,20 @@ int fuse_read(u32 bank, u32 word, u32 *val)
 				*val = (*val >> ((word % 2) * 16)) & 0xFFFF;
 
 			return 0;
-		} else {
-			return -ENOENT;
 		}
 	}
+
+	return fuse_sense(bank, word, val);
+}
+
+static int fuse_read_ele_shd(u32 bank, u32 word, u32 *val)
+{
+	u32 res = 0;
+	int ret;
+	struct udevice *dev = gd->arch.ele_dev;
+
+	if (!dev)
+		return -ENODEV;
 
 	ret = ele_read_shadow_fuse((bank * 8 + word), val, &res);
 	if (ret) {
@@ -308,6 +309,18 @@ int fuse_read(u32 bank, u32 word, u32 *val)
 	}
 
 	return 0;
+}
+
+int fuse_read(u32 bank, u32 word, u32 *val)
+{
+	if (word >= WORDS_PER_BANKS || !val)
+		return -EINVAL;
+
+	if (!IS_ENABLED(CONFIG_SPL_BUILD) &&
+	    env_get_yesno("enable_ele_shd") == 1)
+		return fuse_read_ele_shd(bank, word, val);
+	else
+		return fuse_read_default(bank, word, val);
 }
 
 int fuse_prog(u32 bank, u32 word, u32 val)
