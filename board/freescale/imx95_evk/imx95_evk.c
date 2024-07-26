@@ -49,7 +49,8 @@ struct tcpc_port portpd;
 struct tcpc_port_config port_config = {
 	.i2c_bus = 2, /* i2c3 */
 	.addr = 0x50,
-	.port_type = TYPEC_PORT_DFP,
+	.port_type = TYPEC_PORT_DRP,
+	.disable_pd = true,
 };
 
 struct tcpc_port_config portpd_config = {
@@ -65,7 +66,8 @@ struct tcpc_port_config portpd_config = {
 struct tcpc_port_config port_config = {
 	.i2c_bus = 6, /* i2c7 */
 	.addr = 0x50,
-	.port_type = TYPEC_PORT_DFP,
+	.port_type = TYPEC_PORT_DRP,
+	.disable_pd = true,
 };
 #endif
 
