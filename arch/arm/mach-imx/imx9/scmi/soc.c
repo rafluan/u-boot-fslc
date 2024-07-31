@@ -743,8 +743,18 @@ void build_info(void)
 {
 	u32 fw_version, sha1, res = 0, status;
 	int ret;
+	struct scmi_imx_misc_build_info_out out = { 0 };
+	struct scmi_msg msg = SCMI_MSG(SCMI_IMX_PROTOCOL_ID_MISC,
+				       SCMI_IMX_MISC_BUILD_INFO, out);
 
 	printf("\nBuildInfo:\n");
+
+	ret = devm_scmi_process_msg(gd->arch.scmi_dev, &msg);
+	if (ret || out.status)
+		printf("%s:%d:%d fail to get build info\n", __func__, ret, out.status);
+	else
+		printf("  - SM firmware Build %u, Commit %8x, %s %s\n", out.buildnum,
+		       out.buildcommit, out.builddate, out.buildtime);
 
 	ret = ele_get_fw_status(&status, &res);
 	if (ret) {
