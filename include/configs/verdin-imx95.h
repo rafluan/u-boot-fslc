@@ -70,12 +70,14 @@
             "xennetboot=" \
                 "setenv get_cmd dhcp;" \
                 "setenv console ${xenlinux_console};" \
+		"setenv jh_clk clk_ignore_unused;" \
                 "run netargs;" \
                 "run xenboot_common;" \
             "\0" \
             "xenmmcboot=" \
                 "setenv get_cmd \"fatload mmc ${mmcdev}:${mmcpart}\";" \
                 "setenv console ${xenlinux_console};" \
+		"setenv jh_clk clk_ignore_unused;" \
                 "run mmcargs;" \
                 "run xenboot_common;" \
             "\0" \
