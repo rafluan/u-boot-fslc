@@ -47,6 +47,7 @@
 #endif
 #include <spl.h>
 #include <mmc.h>
+#include <kaslr.h>
 
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -853,6 +854,7 @@ static bool is_m7_off(void)
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
 	u32 val;
+	int ret = 0;
 
 	if (is_imx95()) {
 		val = BIT(6) | BIT(7); /* In case fuse read failure, disable PCIE */
@@ -867,6 +869,13 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 
 	if (is_imx95() && is_m7_off()) {
 		disable_m7_node(blob);
+	}
+
+	if (IS_ENABLED(CONFIG_KASLR)) {
+		ret = do_generate_kaslr(blob);
+		if (ret)
+			printf("Unable to set property %s, err=%s\n",
+				"kaslr-seed", fdt_strerror(ret));
 	}
 
 	return ft_add_optee_node(blob, bd);
