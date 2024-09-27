@@ -70,6 +70,16 @@
 	 *     mtd3: 16M      (dtb)
 	 *     mtd4: left     (rootfs)
 	 */
+#define VIDEO_ARGS        "${video_args}"
+#define VIDEO_ARGS_SCRIPT "run video_args_script; "
+
+#define CONFIG_PREBOOT \
+	"if hdmidet; then " \
+		"setenv video_interfaces hdmi lvds; " \
+	"else " \
+		"setenv video_interfaces lvds hdmi; " \
+	"fi;"
+
 #define CFG_EXTRA_ENV_SETTINGS \
 	CFG_MFG_ENV_SETTINGS \
 	TEE_ENV \
@@ -194,9 +204,21 @@
 			"fi; "	\
 		"fi\0" \
 	EMMC_ENV	  \
-	"smp=" SYS_NOSMP "\0"\
-	"mmcargs=setenv bootargs console=${console},${baudrate} ${smp} " \
-		"root=${mmcroot}\0" \
+	"video_args_hdmi=setenv video_args $video_args " \
+		"video=mxcfb${fb}:dev=hdmi,1280x720M@60,if=RGB24\0" \
+	"video_args_lvds=setenv video_args $video_args " \
+		"video=mxcfb${fb}:dev=ldb,LDB-XGA,if=RGB666\0" \
+	"video_args_lcd=setenv video_args $video_args " \
+		"video=mxcfb${fb}:dev=lcd,CLAA-WVGA,if=RGB666\0" \
+	"fb=0\0" \
+	"video_args_script=" \
+		"for v in ${video_interfaces}; do " \
+			"run video_args_${v}; " \
+			"setexpr fb $fb + 1; " \
+		"done\0" \
+	"mmcargs=setenv bootargs console=${console},${baudrate} ${smp}" \
+		"root=PARTUUID=${uuid} rootwait rw " \
+		VIDEO_ARGS "\0" \
 	"loadbootscript=" \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script} || " \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} boot/${script};\0" \
@@ -209,6 +231,8 @@
 	"loadtee=load mmc ${mmcdev}:${mmcpart} ${tee_addr} ${tee_file} || " \
 		"load mmc ${mmcdev}:${mmcpart} ${tee_addr} boot/${tee_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run finduuid; " \
+		VIDEO_ARGS_SCRIPT \
 		"run mmcargs; " \
 		"if test ${tee} = yes; then " \
 			"run loadfdt; run loadtee; bootm ${tee_addr} - ${fdt_addr}; " \
